@@ -384,17 +384,100 @@ order = {
     "2": "PopIt",
     "3": "Cherplayyer"
 }
-def cora(): #CORA: Cherry Os Run App
-    global commands, order
-    while not CherryAPI.pressed(2):
+def cora_list_files():
+    excluded = ("main.py", "CherryOS.py", "CherryAPI.py", "kernel.py", "boot.py", "COSS.py")
+    files = []
+    for f in os.listdir():
+        if f.endswith(".py") and f not in excluded:
+            files.append(f)
+    return files
+
+def cora_scan_file(filename):
+    threats = []
+    try:
+        with open(filename, "r") as f:
+            content = f.read()
+    except:
+        return ["read_error"]
+    if "import _kernel" in content:
+        threats.append("import _kernel")
+    if "os.remove" in content:
+        threats.append("os.remove")
+    if '"w")' in content or "'w')" in content or '"w",' in content or "'w'," in content:
+        threats.append("file write")
+    return threats
+
+def cora_launch(filename):
+    threats = cora_scan_file(filename)
+    if threats:
         CherryAPI.fill(0)
-        CherryAPI.rect(0, 0, 127, 63, 1)
-        CherryAPI.text("Choose app", 0, 0, 1)
-        CherryAPI.text("with CORA:", 0, 10, 1)
-        start = 0
-        end = 2
-        CherryAPI.text(order[str(start)], 0, 20, 1)
+        CherryAPI.text("WARNING!", 0, 0, 1)
+        CherryAPI.text("Suspicious code:", 0, 10, 1)
+        CherryAPI.text(str(threats[0])[:16], 0, 20, 1)
+        CherryAPI.text("Enter password", 0, 40, 1)
+        CherryAPI.text("to continue", 0, 50, 1)
         CherryAPI.show()
+        while CherryAPI.pressed(2):
+            pass
+        if not password_check(False):
+            return None
+    modname = filename[:-3] if filename.endswith(".py") else filename
+    try:
+        __import__(modname)
+    except Exception as e:
+        CherryAPI.fill(0)
+        CherryAPI.text("App failed!", 0, 0, 1)
+        err = str(e)
+        for i in range(4):
+            start = i * 16
+            end = start + 16
+            chunk = err[start:end]
+            if not chunk:
+                break
+            CherryAPI.text(chunk, 0, (i * 9) + 12, 1)
+        CherryAPI.show()
+        while not CherryAPI.pressed(2):
+            pass
+        while CherryAPI.pressed(2):
+            pass
+
+def cora(): #CORA: Cherry Os Run App
+    files = cora_list_files()
+    if not files:
+        CherryAPI.fill(0)
+        CherryAPI.text("CORA", 0, 0, 1)
+        CherryAPI.text("No files found", 0, 20, 1)
+        CherryAPI.show()
+        time.sleep(1)
+        return None
+    choice = 0
+    while True:
+        CherryAPI.fill(0)
+        CherryAPI.text("CORA - Run App", 0, 0, 1)
+        CherryAPI.text(f"{choice + 1}/{len(files)}", 0, 54, 1)
+        name = files[choice]
+        if len(name) > 16:
+            name = name[:13] + "..."
+        CherryAPI.rect(0, 20, 128, 16, 1)
+        CherryAPI.text(name, 4, 25, 1)
+        CherryAPI.show()
+        if CherryAPI.pressed(1):
+            CherryAPI.click(volume)
+            choice = (choice + 1) % len(files)
+            while CherryAPI.pressed(1):
+                pass
+        elif CherryAPI.pressed(3):
+            CherryAPI.click(volume)
+            choice = (choice - 1) % len(files)
+            while CherryAPI.pressed(3):
+                pass
+        elif CherryAPI.pressed(2):
+            CherryAPI.click(volume)
+            while CherryAPI.pressed(2):
+                pass
+            cora_launch(files[choice])
+            return None
+        time.sleep(0.1)
 def get_temp(offset=0):
     return CherryAPI.temp() + offset
 
@@ -955,7 +1038,13 @@ while not password_check(False):
     pass
 while True:
     gc.collect()
-    if mode == 6:
+    if mode == 7:
+        if CherryAPI.pressed(2):
+            CherryAPI.click(volume)
+            while CherryAPI.pressed(2):
+                pass
+            cora()
+    elif mode == 6:
         if CherryAPI.pressed(2):
             CherryAPI.click(volume)
             while CherryAPI.pressed(2):
@@ -996,7 +1085,7 @@ while True:
                 continue
     if CherryAPI.pressed(1):
         CherryAPI.click(volume)
-        if mode < 6:
+        if mode < 7:
             mode += 1
         else:
             mode = 0
@@ -1007,10 +1096,16 @@ while True:
         if mode >= 1:
             mode -= 1
         else:
-            mode = 6
+            mode = 7
         while CherryAPI.pressed(3):
             pass
-    if mode == 6:
+    if mode == 7:
+        CherryAPI.fill(0)
+        CherryAPI.text("CORA", 0, 0, 1)
+        CherryAPI.text("Black = run app", 0, 10, 1)
+        CherryAPI.show()
+        time.sleep(0.15)
+    elif mode == 6:
         CherryAPI.fill(0)
         CherryAPI.text("CherPlayyer", 0, 0, 1)
         CherryAPI.text("Black = audio)", 0, 10, 1)
