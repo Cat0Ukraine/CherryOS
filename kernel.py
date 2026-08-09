@@ -229,7 +229,7 @@ def battery_check(t):
         return
     v = _system.get_voltage()
     if v <= 0.0:
-        return  # no battery sensor / no reading, skip
+        return 
     if v < LOW_BATTERY_CUTOFF:
         _system.force_shutdown_low_battery()
 
@@ -317,18 +317,18 @@ class System:
             return override
         try:
             cause = machine.reset_cause()
+            reasons = {}
+            for name, label in (
+                ("PWRON_RESET", "Power on"),
+                ("WDT_RESET", "Watchdog reset"),
+                ("SOFT_RESET", "Soft reset (code)"),
+                ("DEEPSLEEP_RESET", "Woke from sleep"),
+            ):
+                if hasattr(machine, name):
+                    reasons[getattr(machine, name)] = label
+            return reasons.get(cause, "Unknown/Hard reset")
         except:
             return "Unknown"
-        reasons = {
-            machine.PWRON_RESET: "Power on",
-            machine.WDT_RESET: "Watchdog reset",
-            machine.SOFT_RESET: "Soft reset (code)",
-        }
-        try:
-            reasons[machine.DEEPSLEEP_RESET] = "Woke from sleep"
-        except AttributeError:
-            pass
-        return reasons.get(cause, "Unknown/Hard reset")
 
     # --- Extra hardware access ---
     def get_voltage(self):
