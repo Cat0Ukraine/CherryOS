@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# 🍒 CherryOS Auto-Flasher via mpremote (Linux) 🍒
+
+set -e
+
+SRC_DIR="${SRC_DIR:-$HOME/Projects/MicroPython/CherryOS}"
+FILES=("CherryOS.py" "kernel.py" "main.py" "CherryAPI.py")
+
+echo "============================================="
+echo "🍒 CherryOS Auto-Flasher via mpremote 🍒"
+echo "============================================="
+
+if ! command -v mpremote >/dev/null 2>&1; then
+    echo "❌ mpremote не знайдено. Встанови: pip install mpremote"
+    exit 1
+fi
+
+if ! mpremote connect list >/dev/null 2>&1; then
+    echo "❌ Помилка: Raspberry Pi Pico не знайдено!"
+    echo "Перевір підключення по USB (і права на /dev/ttyACM*, якщо треба - sudo usermod -aG dialout \$USER)"
+    exit 1
+fi
+
+echo "⏳ Починаю копіювання файлів на плату..."
+echo "---------------------------------------------"
+
+i=1
+total=${#FILES[@]}
+for file in "${FILES[@]}"; do
+    echo "📦 [$i/$total] Копіюю $file..."
+    if mpremote cp "$SRC_DIR/$file" ":$file"; then
+        echo "✅ Успішно!"
+    else
+        echo "❌ Помилка копіювання $file"
+        exit 1
+    fi
+    i=$((i + 1))
+done
+
+echo "---------------------------------------------"
+echo "🚀 Усі файли успішно завантажено!"
+echo "🔄 Синхронізую час і перезапускаю main.py..."
+
+mpremote rtc --set + run "$SRC_DIR/main.py"
+
+echo "✨ Готово! CherryOS запущено."
+echo "============================================="
