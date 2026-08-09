@@ -44,9 +44,9 @@ class CherryAPI:
         if _kernel:
             _kernel._display.fill(value)
     @staticmethod
-    def show(battery=False):
+    def show(visible=True):
         if _kernel:
-            if battery and _kernel.get_setting("show_battery", True):
+            if visible and _kernel.get_setting("show_battery", True):
                 pct = _kernel.get_battery_percent()
                 _kernel._display.fill_rect(101, 0, 27, 8, 0)
                 _kernel._display.text(f"{pct}%", 101, 0, 1)
