@@ -74,9 +74,9 @@ def popplay():
     CherryAPI.click(volume)
     while CherryAPI.pressed(2):
         pass
+    i = 0
     while allow:
-        i = 0
-        x1 = random.randint(10, 110)
+        x1 = random.randint(15, 113)
         x2 = max(2, round(15 - (streak / 5)))
         while not CherryAPI.pressed(2):
             if facingright:
@@ -409,16 +409,38 @@ def cora_scan_file(filename):
 
 def cora_launch(filename):
     threats = cora_scan_file(filename)
-    if threats:
+    if threats == ["read_error"]:
         CherryAPI.fill(0)
-        CherryAPI.text("WARNING!", 0, 0, 1)
-        CherryAPI.text("Suspicious code:", 0, 10, 1)
-        CherryAPI.text(str(threats[0])[:16], 0, 20, 1)
-        CherryAPI.text("Enter password", 0, 40, 1)
-        CherryAPI.text("to continue", 0, 50, 1)
+        CherryAPI.text("Can't read file", 0, 0, 1)
+        CherryAPI.text("Scan failed, app", 0, 12, 1)
+        CherryAPI.text("blocked for safety", 0, 22, 1)
         CherryAPI.show()
+        while not CherryAPI.pressed(2):
+            pass
         while CherryAPI.pressed(2):
             pass
+        return None
+    if threats:
+        choice = 0  # 0 = Exit (default), 1 = Launch
+        while True:
+            CherryAPI.fill(0)
+            CherryAPI.text("WARNING!", 0, 0, 1)
+            CherryAPI.text(str(threats[0])[:16], 0, 10, 1)
+            CherryAPI.text(("> " if choice == 0 else " ") + "Exit", 0, 30, 1)
+            CherryAPI.text(("> " if choice == 1 else " ") + "Launch", 0, 42, 1)
+            CherryAPI.show()
+            if CherryAPI.pressed(1) or CherryAPI.pressed(3):
+                CherryAPI.click(volume)
+                choice = 1 - choice
+                while CherryAPI.pressed(1) or CherryAPI.pressed(3):
+                    pass
+            elif CherryAPI.pressed(2):
+                CherryAPI.click(volume)
+                while CherryAPI.pressed(2):
+                    pass
+                if choice == 0:
+                    return None
+                break
         if not password_check(False):
             return None
     modname = filename[:-3] if filename.endswith(".py") else filename

@@ -6,6 +6,8 @@ import machine
 
 volume = 8192
 
+def panic():
+    raise Exception("Testing panic")
 
 def show_info():
     used, total = CherryAPI.disk_info()
@@ -46,13 +48,13 @@ def hard_reset():
 
 
 def run():
-    options = ["System info", "Hard reset", "Continue to CherryOS"]
+    options = ["Continue to CherryOS", "System info", "Hard reset", "Panic"]
     choice = 0
     while True:
         CherryAPI.fill(0)
         CherryAPI.text("COSS (BIOS)", 0, 0, 1)
         for i, opt in enumerate(options):
-            prefix = "> " if i == choice else "  "
+            prefix = "> " if i == choice else " "
             CherryAPI.text(prefix + opt, 0, 16 + i * 12, 1)
         CherryAPI.show()
 
@@ -70,11 +72,13 @@ def run():
             CherryAPI.click(volume)
             while CherryAPI.pressed(2):
                 pass
-            if choice == 0:
-                show_info()
-            elif choice == 1:
-                hard_reset()
+            if choice == 3:
+                panic()
             elif choice == 2:
+                hard_reset()
+            elif choice == 1:
+                show_info()
+            elif choice == 0:
                 __import__('CherryOS')
                 return None
         time.sleep(0.1)

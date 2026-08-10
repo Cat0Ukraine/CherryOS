@@ -229,7 +229,7 @@ def battery_check(t):
         return
     v = _system.get_voltage()
     if v <= 0.0:
-        return 
+        return  # no battery sensor / no reading, skip
     if v < LOW_BATTERY_CUTOFF:
         _system.force_shutdown_low_battery()
 
