@@ -11,37 +11,37 @@ echo "🍒 CherryOS Auto-Flasher via mpremote 🍒"
 echo "============================================="
 
 if ! command -v mpremote >/dev/null 2>&1; then
-    echo "❌ mpremote не знайдено. Встанови: pip install mpremote"
+    echo "❌ mpremote not found. Install it: pip install mpremote"
     exit 1
 fi
 
 if ! mpremote connect list >/dev/null 2>&1; then
-    echo "❌ Помилка: Raspberry Pi Pico не знайдено!"
-    echo "Перевір підключення по USB (і права на /dev/ttyACM*, якщо треба - sudo usermod -aG dialout \$USER)"
+    echo "❌ Error: Raspberry Pi Pico not found!"
+    echo "Check the USB connection (and /dev/ttyACM* permissions if needed - sudo usermod -aG dialout \$USER)"
     exit 1
 fi
 
-echo "⏳ Починаю копіювання файлів на плату..."
+echo "⏳ Copying files to the board..."
 echo "---------------------------------------------"
 
 i=1
 total=${#FILES[@]}
 for file in "${FILES[@]}"; do
-    echo "📦 [$i/$total] Копіюю $file..."
+    echo "📦 [$i/$total] Copying $file..."
     if mpremote cp "$SRC_DIR/$file" ":$file"; then
-        echo "✅ Успішно!"
+        echo "✅ Done!"
     else
-        echo "❌ Помилка копіювання $file"
+        echo "❌ Failed to copy $file"
         exit 1
     fi
     i=$((i + 1))
 done
 
 echo "---------------------------------------------"
-echo "🚀 Усі файли успішно завантажено!"
-echo "🔄 Синхронізую час і перезапускаю main.py..."
+echo "🚀 All files uploaded successfully!"
+echo "🔄 Syncing time and restarting main.py..."
 
 mpremote rtc --set + run "$SRC_DIR/main.py"
 
-echo "✨ Готово! CherryOS запущено."
+echo "✨ Done! CherryOS is running."
 echo "============================================="

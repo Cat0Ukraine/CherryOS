@@ -1,66 +1,64 @@
 @echo off
 chcp 65001 > nul
 
-:: Шлях до твоїх файлів
 set "SRC_DIR=%USERPROFILE%\Projects\MicroPython\CherryOS"
 
 echo =============================================
 echo 🍒 CherryOS Auto-Flasher via mpremote 🍒
 echo =============================================
 
-:: Перевіряємо, чи підключено Raspberry Pi Pico
 mpremote connect list >nul 2>&1
 if %ERRORLEVEL% neq 0 (
-    echo ❌ Помилка: Raspberry Pi Pico не знайдено!
-    echo Перевірте підключення по USB та спробуйте ще раз.
+    echo ❌ Error: Raspberry Pi Pico not found!
+    echo Check the USB connection and try again.
     exit /b 1
 )
 
-echo ⏳ Починаю копіювання файлів на плату...
+echo ⏳ Copying files to the board...
 echo ---------------------------------------------
 
-echo 📦 [1/4] Копіюю CherryOS.py...
+echo 📦 [1/4] Copying CherryOS.py...
 mpremote cp "%SRC_DIR%\CherryOS.py" :CherryOS.py
 if %ERRORLEVEL% neq 0 (
-    echo ❌ Помилка копіювання CherryOS.py
+    echo ❌ Failed to copy CherryOS.py
     exit /b 1
 ) else (
-    echo ✅ Успішно!
+    echo ✅ Done!
 )
 
-echo 📦 [2/4] Копіюю kernel.py...
+echo 📦 [2/4] Copying kernel.py...
 mpremote cp "%SRC_DIR%\kernel.py" :kernel.py
 if %ERRORLEVEL% neq 0 (
-    echo ❌ Помилка копіювання kernel.py
+    echo ❌ Failed to copy kernel.py
     exit /b 1
 ) else (
-    echo ✅ Успішно!
+    echo ✅ Done!
 )
 
-echo 📦 [3/4] Копіюю main.py...
+echo 📦 [3/4] Copying main.py...
 mpremote cp "%SRC_DIR%\main.py" :main.py
 if %ERRORLEVEL% neq 0 (
-    echo ❌ Помилка копіювання main.py
+    echo ❌ Failed to copy main.py
     exit /b 1
 ) else (
-    echo ✅ Успішно!
+    echo ✅ Done!
 )
 
-echo 📦 [4/4] Копіюю CherryAPI.py...
+echo 📦 [4/4] Copying CherryAPI.py...
 mpremote cp "%SRC_DIR%\CherryAPI.py" :CherryAPI.py
 if %ERRORLEVEL% neq 0 (
-    echo ❌ Помилка копіювання CherryAPI.py
+    echo ❌ Failed to copy CherryAPI.py
     exit /b 1
 ) else (
-    echo ✅ Успішно!
+    echo ✅ Done!
 )
 
 echo ---------------------------------------------
-echo 🚀 Усі файли успішно завантажено!
-echo 🔄 Перезавантажую Raspberry Pi Pico...
+echo 🚀 All files uploaded successfully!
+echo 🔄 Restarting Raspberry Pi Pico...
 
 mpremote rtc --set + run "%SRC_DIR%\main.py"
 
-echo ✨ Готово! CherryOS запущено.
+echo ✨ Done! CherryOS is running.
 echo =============================================
 pause
