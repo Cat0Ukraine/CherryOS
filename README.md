@@ -139,8 +139,8 @@ def run():
 
     CherryAPI.fill(0)
     CherryAPI.text("Dodger", 0, 0, 1)
-    CherryAPI.text("Next/Prev = move", 0, 20, 1)
-    CherryAPI.text("Black = start", 0, 32, 1)
+    CherryAPI.text(f"{CherryAPI.button_name('next')}/{CherryAPI.button_name('prev')} = move", 0, 20, 1)
+    CherryAPI.text(f"{CherryAPI.button_name('enter')} = start", 0, 32, 1)
     CherryAPI.show()
     while CherryAPI.pressed(2):
         pass
@@ -179,7 +179,7 @@ def run():
     CherryAPI.fill(0)
     CherryAPI.text("Game over!", 0, 0, 1)
     CherryAPI.text(f"Score: {score // 10}", 0, 12, 1)
-    CherryAPI.text("Black - exit", 0, 40, 1)
+    CherryAPI.text(f"{CherryAPI.button_name('enter')} - exit", 0, 40, 1)
     CherryAPI.sound(300, 0.3, volume)
     CherryAPI.show()
     while not CherryAPI.pressed(2):
@@ -196,6 +196,7 @@ run()
 - Keep game state in local variables inside `run()`, not globals — CORA re-imports the module fresh each launch
 - End with a game-over screen that waits for Enter before returning, so the player sees their result instead of snapping straight back to the CORA menu
 - `CherryAPI.fill_rect(x, y, width, height, color)` is your main drawing tool for anything beyond text — cheap and fast on a 128x64 mono display
+- Use `CherryAPI.button_name('next' / 'prev' / 'enter')` instead of hardcoding "black"/"red" in on-screen text — button colors are user-configurable, so a hardcoded label can end up telling the player to press the wrong button
 
 ---
 
