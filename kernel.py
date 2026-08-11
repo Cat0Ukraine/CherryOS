@@ -1,3 +1,4 @@
+# kernel for CherryOS
 # ! Important
 # ! Pls do not edit this, if you dont know what you do!!!!
 # ! It can damage your hardware 
@@ -6,7 +7,7 @@
 # ! Buttons - GPIO (2-4)
 # ! Passive buzzer - GPIO 5
 # ! Be careful when connecting >.<
-# ** You can change GPIO there <3
+# * You can change GPIO there <3
 gpsda = 0 # Don`t forget good I2C pin))
 gpscl = 1 # Don`t forget good I2C pin))
 gpbutton = 4 # Next (right)
@@ -26,7 +27,7 @@ import os
 CONFIG_PATH = "config.json"
 
 DEFAULT_CONFIG = {
-    "buttons": {"next": "red", "enter": "black", "prev": "red"},
+    "buttons": {"next": "red", "enter": "black", "prev": "red"}, # * Change colors to yours
     "volume_step": 8,
     "password": "0000",
     "last_time": [2021, 1, 1, 0, 0, 0],
@@ -36,7 +37,6 @@ DEFAULT_CONFIG = {
 }
 
 # Battery voltage range: 3.0V = 0%, 4.2V (full Li-ion charge) = 100%.
-# Anything above 4.2V (e.g. 5V straight from USB) is clamped to 100% via min().
 BATTERY_MIN = 3.0
 BATTERY_MAX = 4.2
 LOW_BATTERY_WARN = 3.0

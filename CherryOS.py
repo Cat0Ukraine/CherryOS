@@ -66,7 +66,7 @@ def popplay():
     CherryAPI.fill(1)
     CherryAPI.text("Tap black when", 1, 1, 0)
     CherryAPI.text("line on rect", 1, 11, 0)
-    CherryAPI.text("Black - continue", 1, 21, 0)
+    CherryAPI.text(f"{CherryAPI.button_name("enter")} - continue", 1, 21, 0)
     CherryAPI.show()
     streak = 1
     while not CherryAPI.pressed(2):
@@ -107,7 +107,7 @@ def popplay():
             for i in range(800, 200, -25):
                 CherryAPI.sound(i, 0.05, volume)
             CherryAPI.text(f"Streak: {streak}", 0, 10, 1)
-            CherryAPI.text("Black - exit", 0, 20, 1)
+            CherryAPI.text(f"{CherryAPI.button_name("enter")} - exit", 0, 20, 1)
             CherryAPI.show()
             while not CherryAPI.pressed(2):
                 pass
@@ -200,7 +200,7 @@ def dice_anim():
             number = random.randint(1, 6)
         CherryAPI.fill(0)
         CherryAPI.text("Dice!", 0, 0, 1)
-        CherryAPI.text("Black - throw!", 0, 10, 1)
+        CherryAPI.text(f"{CherryAPI.button_name("enter")} - throw!", 0, 10, 1)
         CherryAPI.text(f"Number: {number}", 0, 20, 1)
         CherryAPI.show()
         if number == ".":
@@ -304,7 +304,7 @@ def cherplayyer():
 
     choice = 0
     CherryAPI.fill(0)
-    CherryAPI.text("Red - next", 0, 0, 1)
+    CherryAPI.text(f"{CherryAPI.button_name("next")} - next", 0, 0, 1)
     CherryAPI.show()
     while True:
         if CherryAPI.pressed(1):
@@ -1124,25 +1124,25 @@ while True:
     if mode == 7:
         CherryAPI.fill(0)
         CherryAPI.text("CORA", 0, 0, 1)
-        CherryAPI.text("Black = run app", 0, 10, 1)
+        CherryAPI.text(f"{CherryAPI.button_name("enter")} = run app", 0, 10, 1)
         CherryAPI.show()
         time.sleep(0.15)
     elif mode == 6:
         CherryAPI.fill(0)
         CherryAPI.text("CherPlayyer", 0, 0, 1)
-        CherryAPI.text("Black = audio)", 0, 10, 1)
+        CherryAPI.text(f"{CherryAPI.button_name("enter")} = audio)", 0, 10, 1)
         CherryAPI.show()
         time.sleep(0.15)
     elif mode == 5:
         CherryAPI.fill(0)
         CherryAPI.text("PopIt", 0, 0, 1)
-        CherryAPI.text("Black - start", 0, 10, 1)
+        CherryAPI.text(f"{CherryAPI.button_name("enter")} - start", 0, 10, 1)
         CherryAPI.show()
         time.sleep(0.09)
     elif mode == 4:
         CherryAPI.fill(0)
         CherryAPI.text("Simon!", 0, 0, 1)
-        CherryAPI.text("Black - start", 0, 10, 1)
+        CherryAPI.text(f"{CherryAPI.button_name("enter")} - start", 0, 10, 1)
         if len(colors) < 10: 
             CherryAPI.text(f"({len(colors) + 1})", 100, 54, 1)
         elif 9 < len(colors) and len(colors) < 100:

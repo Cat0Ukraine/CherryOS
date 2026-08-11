@@ -5,6 +5,12 @@ import time
 import machine
 
 volume = 8192
+CherryAPI.clear()
+if CherryAPI.pressed(2):
+    while CherryAPI.pressed(2):
+        CherryAPI.text(f"Release the {CherryAPI.button_name("enter")}", 1, 1, 1)
+        CherryAPI.show()
+        time.sleep(0.01)
 
 def panic():
     raise Exception("Testing panic")
@@ -18,7 +24,7 @@ def show_info():
     CherryAPI.text(f"Up: {CherryAPI.get_uptime()}s", 0, 32, 1)
     CherryAPI.text(f"Bat: {CherryAPI.battery_percent()}%", 0, 42, 1)
     CherryAPI.text(f"Disk:{used}/{total}KB", 0, 52, 1)
-    CherryAPI.show()
+    CherryAPI.show() 
     while not CherryAPI.pressed(2):
         pass
     while CherryAPI.pressed(2):
