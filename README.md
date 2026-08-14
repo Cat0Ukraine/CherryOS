@@ -4,7 +4,7 @@ A lightweight, gaming-focused operating system for the Raspberry Pi Pico, writte
 
 No Linux, no existing RTOS — just a 128x64 OLED, three buttons, a buzzer, and a custom OS built around them.
 
-> ⚠️ **v1.0-beta** — functional and internally tested for logic, but not yet fully verified on real hardware. Expect rough edges.
+> 🎉 **v1.0** — first stable release. Runs the whole current app set (games, CORA, COSS, settings) reliably on real hardware.
 
 ---
 
@@ -14,8 +14,9 @@ No Linux, no existing RTOS — just a 128x64 OLED, three buttons, a buzzer, and 
 - Password-protected lock screen (4-digit PIN)
 - Built-in mini-games: Simon, PopIt (reaction), Dice, Clicker
 - Custom JSON-based audio player (`CherryPlayer`)
-- **CORA** (Cherry Os Run App) — a launcher that scans the flash for external `.py` files and lets you run them, with a built-in scanner that flags suspicious code (`import _kernel`, `os.remove`, file writes) and requires a password before running it
+- **CORA** (Cherry Os Run App) — a launcher that scans the flash for external `.py` files and lets you run them, with a built-in scanner that flags suspicious code (`import _kernel`, `os.remove`, file writes) and requires a password before running it. Includes an **Exit** option so you're never stuck in the launcher.
 - **COSS** — a minimal BIOS-like mode: hard reset, system info, skip straight to CherryOS
+- Compact **carousel-style settings menu** — one option at a time (`< Change volume >`), cycle with Next/Prev, confirm with Enter
 - Persistent settings via `config.json` (button names, volume, password, saved time, battery display toggle)
 - Battery percentage support (3.0V–4.2V range) with a real low-power `lightsleep()` sleep mode and automatic safe shutdown on critically low voltage
 - Shutdown-reason tracking (power on, watchdog reset, soft reset, low battery, etc.)
@@ -61,18 +62,19 @@ pip install mpremote
 
 **5. Flash CherryOS to your Pico:**
 
-Linux/macOS:
+One script, works the same on Linux, macOS, and Windows:
+
 ```bash
-chmod +x flash.sh
-SRC_DIR=$(pwd) ./flash.sh
+python flash.py
 ```
 
-Windows:
+It will ask you:
 ```
-./flash.bat
+COM port (leave empty for auto-detect):
+Run CherryOS after flashing? (Y/n):
 ```
 
-The script copies `CherryOS.py`, `kernel.py`, `main.py`, and `CherryAPI.py` onto the board and restarts it.
+Just press Enter twice for the default (auto-detect port, run immediately after flashing). It copies `CherryOS.py`, `kernel.py`, `main.py`, and `CherryAPI.py` onto the board.
 
 ---
 
@@ -92,7 +94,7 @@ Default password: `0000` (change it from Settings → Set password).
 
 ## 🧩 Adding your own app (via CORA)
 
-Any standalone `.py` file placed on the Pico's flash (that isn't `main.py`, `kernel.py`, `CherryAPI.py`, or `CherryOS.py`) will show up in the **CORA** launcher automatically. Your app only needs to import `CherryAPI` — never `kernel` directly, that's the whole point of the API layer, it keeps the kernel safe from apps that misbehave.
+Any standalone `.py` file placed on the Pico's flash (that isn't `main.py`, `kernel.py`, `CherryAPI.py`, or `CherryOS.py`) will show up in the **CORA** launcher automatically, right below the built-in **Exit** option. Your app only needs to import `CherryAPI` — never `kernel` directly, that's the whole point of the API layer, it keeps the kernel safe from apps that misbehave.
 
 **Minimal example** — enough to get something on screen:
 
@@ -199,8 +201,6 @@ run()
 
 ---
 
-
-
 ## 📁 Project structure
 
 ```
@@ -209,10 +209,21 @@ CherryAPI.py   # Safe API layer between the kernel and everything else.
 main.py        # Bootloader — decides whether to load CherryOS or COSS.
 CherryOS.py    # The OS itself: UI, games, settings, CORA.
 COSS.py        # Minimal BIOS-like fallback mode (system info, hard reset, forced panic test).
-flash.sh       # Linux/macOS flashing script (mpremote).
-flash.bat      # Windows flashing script (mpremote).
+flash.py       # Cross-platform flashing script (mpremote), replaces flash.sh/flash.bat.
 dodger.py      # Example CORA app — see "Adding your own app" above.
 ```
+
+---
+
+## 🩹 Changelog
+
+**v1.0**
+- Fixed: running the same app twice from CORA did nothing the second time (module caching) — apps now re-run correctly every time
+- Fixed: battery percentage stayed visible on screen for a moment right before power-off / delete-data instead of a clean blank screen
+- Fixed: the software clock could roll `13:59:59` into an invalid `13:60:00` instead of `14:00:00` after certain reboot timing
+- Added: **Exit** option in CORA, so you can leave the launcher without running anything
+- Reworked: Settings menu is now a single-item carousel (`< Change volume >`) instead of a 9-item scrolling list
+- Replaced `flash.sh` + `flash.bat` with a single cross-platform `flash.py`, with a short interactive prompt (COM port, run after flashing)
 
 ---
 

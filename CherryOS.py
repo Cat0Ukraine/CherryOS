@@ -374,16 +374,6 @@ def cherplayyer():
                     time.sleep(dur)
             return None
 progress()
-commands = {
-    "Simon": play,
-    "PopIt": popplay,
-    "Cherplayyer": cherplayyer
-}
-order = {
-    "1": "Simon",
-    "2": "PopIt",
-    "3": "Cherplayyer"
-}
 def cora_list_files():
     excluded = ("main.py", "CherryOS.py", "CherryAPI.py", "kernel.py", "boot.py", "COSS.py")
     files = []
@@ -421,7 +411,7 @@ def cora_launch(filename):
             pass
         return None
     if threats:
-        choice = 0  # 0 = Exit (default), 1 = Launch
+        choice = 0
         while True:
             CherryAPI.fill(0)
             CherryAPI.text("WARNING!", 0, 0, 1)
@@ -445,6 +435,8 @@ def cora_launch(filename):
             return None
     modname = filename[:-3] if filename.endswith(".py") else filename
     try:
+        if modname in sys.modules:
+            del sys.modules[modname]
         __import__(modname)
     except Exception as e:
         CherryAPI.fill(0)
@@ -465,6 +457,7 @@ def cora_launch(filename):
 
 def cora(): #CORA: Cherry Os Run App
     files = cora_list_files()
+    items = ["Exit"] + files
     if not files:
         CherryAPI.fill(0)
         CherryAPI.text("CORA", 0, 0, 1)
@@ -476,8 +469,8 @@ def cora(): #CORA: Cherry Os Run App
     while True:
         CherryAPI.fill(0)
         CherryAPI.text("CORA - Run App", 0, 0, 1)
-        CherryAPI.text(f"{choice + 1}/{len(files)}", 0, 54, 1)
-        name = files[choice]
+        CherryAPI.text(f"{choice + 1}/{len(items)}", 0, 54, 1)
+        name = items[choice]
         if len(name) > 16:
             name = name[:13] + "..."
         CherryAPI.rect(0, 20, 128, 16, 1)
@@ -485,19 +478,21 @@ def cora(): #CORA: Cherry Os Run App
         CherryAPI.show()
         if CherryAPI.pressed(1):
             CherryAPI.click(volume)
-            choice = (choice + 1) % len(files)
+            choice = (choice + 1) % len(items)
             while CherryAPI.pressed(1):
                 pass
         elif CherryAPI.pressed(3):
             CherryAPI.click(volume)
-            choice = (choice - 1) % len(files)
+            choice = (choice - 1) % len(items)
             while CherryAPI.pressed(3):
                 pass
         elif CherryAPI.pressed(2):
             CherryAPI.click(volume)
             while CherryAPI.pressed(2):
                 pass
-            cora_launch(files[choice])
+            if choice == 0:
+                return None
+            cora_launch(items[choice])
             return None
         time.sleep(0.1)
 def get_temp(offset=0):
@@ -701,8 +696,8 @@ def tutorial():
         pass
     CherryAPI.fill(0)
     CherryAPI.text("To launch app", 0, 0, 1)
-    CherryAPI.text(f"press {CherryAPI.button_name('enter')}", 0, 10, 1)
-    CherryAPI.text("on home screen", 0, 20, 1)
+    CherryAPI.text(f"find CORA in", 0, 10, 1)
+    CherryAPI.text("list", 0, 20, 1)
     CherryAPI.show()
     while not CherryAPI.pressed(1):
         pass
@@ -725,78 +720,48 @@ def tutorial():
 progress()
 def settings():
     global points, cherry_icon, cherry_fb, colors, best_score, volume, passwordd, step, audiomode
+
+    items = ["Exit"]
+    if not CherryAPI.time_actual():
+        items.append("Set time")
+    items += ["Change volume", "Sleep", "Delete data", "Power OFF", "Set password", "System info", "Show battery %"]
+
     choice = 0
-    CherryAPI.fill(0)
-    CherryAPI.text("Settings", 0, 5, 1)
-    CherryAPI.show()
     while True:
         CherryAPI.fill(0)
         CherryAPI.text("Settings", 0, 5, 1)
-        if choice == 0:
-            CherryAPI.text("> Exit", 0, 25, 1)
-            if not CherryAPI.time_actual():
-                CherryAPI.text("Set time", 0, 40, 1)
-                CherryAPI.text("Change volume", 0, 55, 1)
-            else:
-                CherryAPI.text("Change volume", 0, 40, 1)
-                CherryAPI.text("Sleep", 0, 55, 1)
-            CherryAPI.show()
-        elif choice == 1:
-            if not CherryAPI.time_actual():
-                CherryAPI.text("Exit", 0, 25, 1)
-                CherryAPI.text("> Set time", 0, 40, 1)
-                CherryAPI.text("Change volume", 0, 55, 1)
-                CherryAPI.show()
-            else:
-                choice += 1
-        elif choice == 2:
-            if not CherryAPI.time_actual():
-                CherryAPI.text("Set time", 0, 25, 1)
-            else:
-                CherryAPI.text("Exit", 0, 25, 1)
-            CherryAPI.text("> Change volume", 0, 40, 1)
-            CherryAPI.text("Sleep", 0, 55, 1)
-            CherryAPI.show()
-        elif choice == 3:
-            CherryAPI.text("Change volume", 0, 25, 1)
-            CherryAPI.text("> Sleep", 0, 40, 1)
-            CherryAPI.text("Delete data", 0, 55, 1)
-            CherryAPI.show()
-        elif choice == 4:
-            CherryAPI.text("Sleep", 0, 25, 1)
-            CherryAPI.text("> Delete data", 0, 40, 1)
-            CherryAPI.text("Power OFF", 0, 55, 1)
-            CherryAPI.show()
-        elif choice == 5:
-            CherryAPI.text("Delete data", 0, 25, 1)
-            CherryAPI.text("> Power OFF", 0, 40, 1)
-            CherryAPI.text("Set password", 0, 55, 1)
-            CherryAPI.show()
-        elif choice == 6:
-            CherryAPI.text("Power OFF", 0, 25, 1)
-            CherryAPI.text("> Set password", 0, 40, 1)
-            CherryAPI.text("System info", 0, 55, 1)
-            CherryAPI.show()
-        elif choice == 7:
-            CherryAPI.text("Set password", 0, 25, 1)
-            CherryAPI.text("> System info", 0, 40, 1)
-            CherryAPI.text("Show battery %", 0, 55, 1)
-            CherryAPI.show()
-        elif choice == 8:
-            CherryAPI.text("System info", 0, 25, 1)
-            CherryAPI.text("> Show battery %", 0, 40, 1)
+        label = items[choice]
+        CherryAPI.text(f"< {label} >", 4, 28, 1)
+        if label == "Show battery %":
             state = "ON" if CherryAPI.get_setting("show_battery", True) else "OFF"
-            CherryAPI.text(f"(currently {state})", 0, 55, 1)
-            CherryAPI.show()
-        if CherryAPI.pressed(2):
+            CherryAPI.text(f"(currently {state})", 4, 45, 1)
+        CherryAPI.show()
+
+        if CherryAPI.pressed(1):
             CherryAPI.click(volume)
-            if choice == 8:
+            choice = (choice + 1) % len(items)
+            while CherryAPI.pressed(1):
+                pass
+        elif CherryAPI.pressed(3):
+            CherryAPI.click(volume)
+            choice = (choice - 1) % len(items)
+            while CherryAPI.pressed(3):
+                pass
+        elif CherryAPI.pressed(2):
+            CherryAPI.click(volume)
+            while CherryAPI.pressed(2):
+                pass
+            label = items[choice]
+
+            if label == "Exit":
+                return None
+
+            elif label == "Show battery %":
                 current = CherryAPI.get_setting("show_battery", True)
                 CherryAPI.set_setting("show_battery", not current)
-                while CherryAPI.pressed(2):
-                    pass
                 return None
-            elif choice == 7:
+
+            elif label == "System info":
                 used, total = CherryAPI.disk_info()
                 CherryAPI.fill(0)
                 CherryAPI.text("System info", 0, 0, 1)
@@ -810,7 +775,8 @@ def settings():
                 while CherryAPI.pressed(2):
                     pass
                 return None
-            elif choice == 6:
+
+            elif label == "Set password":
                 if password_check(False):
                     new = password_check(True)
                     save_data_user(new)
@@ -818,17 +784,19 @@ def settings():
                     return None
                 else:
                     pass
-            elif choice == 5:
+
+            elif label == "Power OFF":
                 save_data(points)
                 save_data_simon(colors)
                 save_data_popit(best_score)
                 save_data_user(passwordd)
                 CherryAPI.fill(0)
-                CherryAPI.show()
+                CherryAPI.show(False)
                 CherryAPI.led("off")
                 time.sleep(0.1)
                 return "poweroff"
-            elif choice == 4:
+
+            elif label == "Delete data":
                 if password_check(False):
                     points = 0
                     colors = []
@@ -840,7 +808,7 @@ def settings():
                     save_data_user(passwordd)
                     saveinfouser(True)
                     CherryAPI.fill(0)
-                    CherryAPI.show()
+                    CherryAPI.show(False)
                     CherryAPI.led("off")
                     time.sleep(0.1)
                     while CherryAPI.pressed(2):
@@ -848,7 +816,8 @@ def settings():
                     return "poweroff"
                 else:
                     pass
-            elif choice == 3:
+
+            elif label == "Sleep":
                 while CherryAPI.pressed(2):
                     pass
                 CherryAPI.fill(0)
@@ -857,7 +826,8 @@ def settings():
                 time.sleep(1)
                 CherryAPI.sleep()
                 return None
-            elif choice == 2:                
+
+            elif label == "Change volume":
                 while CherryAPI.pressed(2):
                     pass
                 while not CherryAPI.pressed(2):
@@ -880,7 +850,8 @@ def settings():
                     pass
                 CherryAPI.set_setting("volume_step", step)
                 return None
-            elif choice == 1:
+
+            elif label == "Set time":
                 CherryAPI.fill(0)
                 year = CherryAPI.get_time(0)
                 month = CherryAPI.get_time(1)
@@ -1019,24 +990,6 @@ def settings():
                 while CherryAPI.pressed(2):
                     pass
                 CherryAPI.set_time(year, month, date, hour, minute, seconds)
-            elif choice == 0:
-                while CherryAPI.pressed(2):
-                    pass
-                return None
-        elif CherryAPI.pressed(1):
-            CherryAPI.click(volume)
-            while CherryAPI.pressed(1):
-                pass
-            if choice < 8:
-                choice += 1
-        elif CherryAPI.pressed(3):
-            CherryAPI.click(volume)
-            while CherryAPI.pressed(3):
-                pass
-            if choice >= 1:
-                choice -= 1
-            if CherryAPI.time_actual() and choice == 1:
-                choice = 0
         time.sleep(0.1)
 progress()
 CherryAPI.led("on")

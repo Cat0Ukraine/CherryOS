@@ -188,26 +188,22 @@ class SSD1306_SPI(SSD1306):
         self.cs(1)
 
 # * --- END SSD1306 ---
-# Dynamic clock
 _system = None
 def timer(t):
     global _system
-    _system.my_time[5] += 1
-    if _system.my_time[5] > 59:
-        _system.my_time[5] = 0
-        _system.my_time[4] += 1
-        if _system.my_time[4] != _system._last_save_minute:
-            _system._last_save_minute = _system.my_time[4]
-            _system.config["last_time"] = list(_system.my_time)
-            _system.save_config()
-        if _system.my_time[4] > 59:
-            _system.my_time[4] = 0
-            _system.my_time[3] += 1
-            if _system.my_time[3] > 23:
-                _system.my_time[3] = 0
-                _system.my_time[2] += 1
-                month = _system.my_time[1]
-                year = _system.my_time[0]
+    s = _system.my_time
+    s[5] += 1
+    if s[5] > 59:
+        s[5] = 0
+        s[4] += 1
+        if s[4] > 59:
+            s[4] = 0
+            s[3] += 1
+            if s[3] > 23:
+                s[3] = 0
+                s[2] += 1
+                month = s[1]
+                year = s[0]
                 if month in [1, 3, 5, 7, 8, 10, 12]:
                     max_days = 31
                 elif month in [4, 6, 9, 11]:
@@ -217,12 +213,18 @@ def timer(t):
                         max_days = 29
                     else:
                         max_days = 28
-                if _system.my_time[2] > max_days:
-                    _system.my_time[2] = 1
-                    _system.my_time[1] += 1
-                    if _system.my_time[1] > 12:
-                        _system.my_time[1] = 1
-                        _system.my_time[0] += 1
+                else:
+                    max_days = 31
+                if s[2] > max_days:
+                    s[2] = 1
+                    s[1] += 1
+                    if s[1] > 12:
+                        s[1] = 1
+                        s[0] += 1
+        if s[4] != _system._last_save_minute:
+            _system._last_save_minute = s[4]
+            _system.config["last_time"] = list(s)
+            _system.save_config()
 def battery_check(t):
     global _system
     if _system is None:
@@ -308,7 +310,6 @@ class System:
         self.config.setdefault("buttons", {})[role] = name
         self.save_config()
 
-    # --- Shutdown reason ---
     def get_shutdown_reason(self):
         override = self.config.get("last_shutdown_reason")
         if override:
@@ -330,7 +331,6 @@ class System:
         except:
             return "Unknown"
 
-    # --- Extra hardware access ---
     def get_voltage(self):
         if not self._vsys:
             return 0.0

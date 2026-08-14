@@ -54,7 +54,7 @@ def hard_reset():
 
 
 def run():
-    options = ["Continue to CherryOS", "System info", "Hard reset", "Panic"]
+    options = ["Launch CherryOS", "System info", "Hard reset", "Panic"]
     choice = 0
     while True:
         CherryAPI.fill(0)

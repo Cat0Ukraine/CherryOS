@@ -26,7 +26,7 @@ try:
     CherryAPI.text("Success!", 0, 20, 1)
     CherryAPI.show()
     time.sleep(0.1)
-    if CherryAPI.pressed(2):
+    if not CherryAPI.pressed(2):
         CherryAPI.text("*Loading OS", 0, 30, 1)
         CherryAPI.show()
         time.sleep(0.1)
