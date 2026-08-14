@@ -3,7 +3,7 @@
 
 from kernel import System
 import time
-_kernel = None  
+_kernel = None
 
 class CherryAPI:
     @staticmethod

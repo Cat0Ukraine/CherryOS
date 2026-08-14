@@ -239,7 +239,7 @@ class System:
     def __init__(self):
         global _system
         _system = self
-        self.version = "v1.0-beta"
+        self.version = "v1.0"
         self._start_time = time.time()
         self._i2c = I2C(0, sda=Pin(gpsda), scl=Pin(gpscl), freq=400000)
         self._display = SSD1306_I2C(128, 64, self._i2c)
@@ -260,13 +260,20 @@ class System:
         self._last_save_minute = -1
 
         self.check_time = time.localtime()
-        if self.check_time[0] < 2025:
-            self.time_actual = False
-            self.timer_run = True
-            self.my_time = list(self.config.get("last_time", [2021, 1, 1, 0, 0, 0]))
-        else:
+        saved_time = list(self.config.get("last_time", [2021, 1, 1, 0, 0, 0]))
+        check_tuple = tuple(self.check_time[0:6])
+        saved_tuple = tuple(saved_time[0:6])
+
+        if check_tuple > saved_tuple:
             self.time_actual = True
             self.timer_run = False
+            self.my_time = list(check_tuple)
+            self.config["last_time"] = list(self.my_time)
+            self.save_config()
+        else:
+            self.time_actual = False
+            self.timer_run = True
+            self.my_time = saved_time
         if not self.time_actual:
             self.clock_timer = Timer(-1)
             self.clock_timer.init(period=1000, mode=Timer.PERIODIC, callback=timer)
