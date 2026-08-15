@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-FILES = ["CherryOS.py", "kernel.py", "main.py", "CherryAPI.py"]
+FILES = ["CherryOS.py", "kernel.py", "main.py", "CherryAPI.py", "COSS.py"]
 
 SRC_DIR = Path(__file__).resolve().parent
 
